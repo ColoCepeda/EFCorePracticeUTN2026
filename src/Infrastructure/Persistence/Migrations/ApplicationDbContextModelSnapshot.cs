@@ -46,6 +46,73 @@ namespace GestionProductos.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Products");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Teclado mecánico",
+                            Name = "Teclado",
+                            Price = 45000m,
+                            Stock = 10
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Mouse inalámbrico",
+                            Name = "Mouse",
+                            Price = 18000m,
+                            Stock = 25
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Monitor 24 pulgadas",
+                            Name = "Monitor",
+                            Price = 210000m,
+                            Stock = 5
+                        });
+                });
+
+            modelBuilder.Entity("GestionProductos.Domain.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Password = "admin123",
+                            Role = "Admin",
+                            UserName = "admin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Password = "alumno123",
+                            Role = "User",
+                            UserName = "alumno"
+                        });
                 });
 #pragma warning restore 612, 618
         }
