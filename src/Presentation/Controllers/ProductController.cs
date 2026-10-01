@@ -3,6 +3,8 @@ using GestionProductos.Application.Interfaces;
 using GestionProductos.Domain.Entities;
 using GestionProductos.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GestionProductos.Presentation.Controllers;
 
@@ -25,8 +27,8 @@ public class ProductController(IProductRepository productRepository) : Controlle
         return Ok(product);
     }
 
-    // [CLASE JWT] Paso 7: proteger con [Authorize]
     [HttpPost]
+    [Authorize]
     public ActionResult<Product> Create([FromBody] ProductRequest request)
     {
         var product = new Product
@@ -42,8 +44,8 @@ public class ProductController(IProductRepository productRepository) : Controlle
         return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
     }
 
-    // [CLASE JWT] Paso 7: proteger con [Authorize] y permitir solo el rol Admin
     [HttpDelete("{id}")]
+    [Authorize]
     public IActionResult Delete(int id)
     {
         var product = productRepository.GetById(id)

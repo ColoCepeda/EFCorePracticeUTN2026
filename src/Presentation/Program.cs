@@ -1,8 +1,13 @@
 using GestionProductos.Application.Interfaces;
 using GestionProductos.Infrastructure.Persistence;
 using GestionProductos.Infrastructure.Repositories;
+using GestionProductos.Infrastructure.Services;
 using GestionProductos.Presentation.Middlewares;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,14 +19,41 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Repositorios
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
-// [CLASE JWT] Paso 5: registrar ICustomAuthenticationService
+builder.Services.AddScoped<ICustomAuthenticationService, AuthenticationService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(); // [CLASE JWT] Paso 6: botón Authorize en Swagger
 
-// [CLASE JWT] Paso 5: AddAuthentication().AddJwtBearer()
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Description = "Pegá acá el token (sin la palabra Bearer)"
+    });
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+    });
+});
+
+
+builder.Services.AddAuthentication("Bearer")
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new()
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Authentication:Issuer"],
+        ValidAudience = builder.Configuration["Authentication:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(
+    Encoding.ASCII.GetBytes(builder.Configuration["Authentication:SecretForKey"]!))
+    };
+});
 
 var app = builder.Build();
 

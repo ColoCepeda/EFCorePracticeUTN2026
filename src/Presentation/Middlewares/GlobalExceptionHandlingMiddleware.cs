@@ -28,7 +28,10 @@ public class GlobalExceptionHandlingMiddleware(RequestDelegate next, ILogger<Glo
                 message = exception.Message;
                 break;
 
-            // [CLASE JWT] Paso 2: case InvalidCredentialsException -> 401
+            case InvalidCredentialsException:
+                statusCode = StatusCodes.Status401Unauthorized;
+                message = exception.Message;
+                break;
 
             default:
                 logger.LogError(exception, "Error no controlado");
